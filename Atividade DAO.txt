@@ -1,0 +1,1379 @@
+AlunoDAO.java
+
+ modelo de pacote . dao ;
+
+importar  java . . _ lista ;
+
+ modelo importado . entidades . Aluno ;
+
+ interface  pública AlunoDAO {
+
+	 inserção vazia ( Aluno  obj );
+	 atualização nula ( Aluno  obj );
+	void  deleteByid ( Integer  id );
+	Aluno  findByid ( Integer  id );
+	List < Aluno > findAll ();
+}
+
+------------------------------------------------------------------
+
+AlunoDAOImpl.java 
+
+ modelo de pacote . dao ;
+
+importar  java . . _ Conexão ;
+importar  java . . _ Declaração Preparada ;
+importar  java . . _ Conjunto de resultados ;
+importar  java . . _ SQLException ;
+importar  java . . _ Declaração ;
+importar  java . . _ ArrayList ;
+importar  java . . _ lista ;
+
+ modelo importado . db . banco de dados ;
+ modelo importado . entidades . Aluno ;
+
+public  class  AlunoDAOImpl  implementa  AlunoDAO {
+
+	 ligação  privada ligação ;
+
+	public  AlunoDAOImpl ( Conexão de  conexão ) {
+		isso . conexao = conexao ;
+	}
+
+	@ Substituir
+	public  void  insert ( Aluno  obj ) {
+
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		tente {
+			pst = conexao . prepareStatement (
+					"INSERT INTO aluno (nome, sexo, dt_nasc) VALORES (?, ?, ?) " ,
+					Declaração . RETURN_GENERATED_KEYS );
+
+			pst . setString ( 1 , obj . getNome ());
+			pst . setString ( 2 , obj . getSexo ());
+			pst . setDate ( 3 , novo  java . sql . Date ( obj . getDt_nasc (). getTime ()));
+
+			int  linhas = pst . executeAtualizar ();
+
+			if ( linhas > 0 ) {
+				rs = pst . getGeneratedKeys ();
+				if ( rs . próximo ()) {
+						obj . setId ( rs . getInt ( 1 ));
+				}
+				Sistema . fora . println ( "Aluno [" 
+									+ obj . getId () + " | " 
+									+ obj . getNome () + "]"
+									+ "foi criado com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi possível cadastrar o Aluno!" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+	}
+
+	@ Substituir
+	public  void  update ( Aluno  obj ) {
+
+		PreparedStatement  pst = null ;
+		tente {
+			pst = conexao . prepareStatement ( "ATUALIZAR aluno SET nome = ?, sexo=?, dt_nasc=? "
+										+ "ONDE idaluno=?" );
+			pst . setString ( 1 , obj . getNome ());
+			pst . setString ( 2 , obj . getSexo ());
+			pst . setDate ( 3 , novo  java . sql . Date ( obj . getDt_nasc (). getTime ()));
+			pst . setInt ( 4 , obj . getId ());
+
+			int  linhas = pst . executeAtualizar ();
+			if ( linhas > 0 ) {	
+				Sistema . fora . println ( "Aluno [" 
+								+ obj . getId () + " | " 
+								+ obj . getNome () + "]"
+								+ " alterado com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi realizada a alteração do Aluno!" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+		}
+	}
+
+	@ Substituir
+	public  void  deletarByid ( id inteiro  ) {
+
+		PreparedStatement  pst = null ;
+		tente {
+			pst = conexao . prepareStatement ( "DELETE FROM aluno WHERE idaluno = ?" );
+			pst . setInt ( 1 , id );
+
+			int  linhas = pst . executeAtualizar ();
+			if ( linhas > 0 ) {	
+				Sistema . fora . println ( " Aluno [" + id + "] excluído com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi possível excluir o Aluno id[" + id + "] !" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+		}
+	}
+
+	@ Substituir
+	public  Aluno  findByid ( Integer  id ) {
+
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		tente {
+			pst = conexao . prepareStatement (
+					"SELECT a.*, c.nomecurso FROM aluno a WHERE idaluno = ?" );
+			pst . setInt ( 1 , id );
+			rs = pst . executeQuery ();
+
+			if ( rs . próximo ()) {
+				Aluno  a = novo  Aluno ();
+				a . setId ( rs . getInt ( 0 ));
+				a . setNome ( rs . getString ( 1 ));
+				a . setSexo ( rs . getString ( 2 ));
+				a . setDt_nasc ( rs . getDate ( 3 ));
+				retornar  um ;
+			}
+			retornar  nulo ;
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}		
+		retornar  nulo ;
+	}
+
+	@ Substituir
+	public  List < Aluno > findAll () {
+
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		List < Aluno > lista = new  ArrayList <>();	
+
+		tente {
+			pst = conexao . prepareStatement ( "SELECT * FROM aluno" );
+			rs = pst . executeQuery ();
+			enquanto ( rs . próximo ()) {   
+				Aluno  a = new  Aluno ( rs . getInt ( "idaluno" ), rs . getString ( "nome" ), rs . getString ( "sexo" ), rs . getDate ( "dt_nasc" ));
+				lista . adicionar ( a );
+			}
+		}
+		catch ( SQLException  e ) {
+			Sistema . fora . println ( e );
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+		 lista de retorno ;	
+	}
+}
+
+-----------------------------------------------------------
+CursoDAO.java
+
+ modelo de pacote . dao ;
+
+importar  java . . _ lista ;
+
+ modelo importado . entidades . curso ;
+
+public  interface  CursoDAO {
+
+	void  inserir ( Curso  obj );
+	void  update ( Curso  obj );
+	void  deleteByid ( Integer  id );
+	Curso  findByid ( Integer  id );
+	List < Curso > findAll ();
+
+}
+
+--------------------------------------------------------
+CursoDAOImpl.java
+modelo de pacote . dao ;
+
+importar  java . . _ Conexão ;
+importar  java . . _ Declaração Preparada ;
+importar  java . . _ Conjunto de resultados ;
+importar  java . . _ SQLException ;
+importar  java . . _ Declaração ;
+importar  java . . _ ArrayList ;
+importar  java . . _ lista ;
+
+ modelo importado . db . banco de dados ;
+ modelo importado . entidades . curso ;
+
+public  class  CursoDAOImpl  implementa  CursoDAO {
+
+	 ligação  privada ligação ;
+
+	public  CursoDAOImpl ( Conexão  conexão ) {
+		isso . conexao = conexao ;
+	}
+
+	@ Substituir
+	public  void  insert ( Curso  obj ) {
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		tente {
+			pst = conexao . prepareStatement ( "INSERT INTO curso (nomecurso) VALUES (?)" ,
+											Declaração . RETURN_GENERATED_KEYS );
+
+			pst . setString ( 1 , obj . getNomecurso ());
+
+			int  linhas = pst . executeAtualizar ();
+
+			if ( linhas > 0 ) {
+				rs = pst . getGeneratedKeys ();
+				if ( rs . próximo ()) {
+					obj . setIdcurso ( rs . getInt ( 1 ));
+				}
+				Sistema . fora . println ( " | Curso [ " 
+									+ obj . getIdcurso () + " | " 
+									+   obj . getNomecurso () + "]"
+									+ "foi criado com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi possível cadastrar o Curso!" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+	}
+	@ Substituir
+	public  void  update ( Curso  obj ) {
+
+		PreparedStatement  pst = null ;
+		tente {
+			pst = conexao . prepareStatement ( "ATUALIZAR curso SET nomecurso = ? "
+										  + "WHERE idcurso = ?" );
+			pst . setString ( 1 , obj . getNomecurso ());
+			pst . setInt ( 2 , obj . getIdcurso ());
+
+			int  linhas = pst . executeAtualizar ();
+			if ( linhas > 0 ) {	
+				Sistema . fora . println ( " Curso [ " 
+								+ obj . getIdcurso () + " | " 
+								+ obj . getNomecurso () + "]"
+								+ " alterado com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi realizada a alteração do Curso!" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+		}
+	}
+
+	@ Substituir
+	public  void  deletarByid ( id inteiro  ) {
+
+		PreparedStatement  pst = null ;
+		tente {
+			pst = conexao . prepareStatement ( "DELETE FROM curso WHERE idcurso = ?" );
+			pst . setInt ( 1 , id );
+
+			int  linhas = pst . executeAtualizar ();
+			if ( linhas > 0 ) {	
+				Sistema . fora . println ( "Curso [" + id + "] excluído com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi possível excluir o Curso id[" + id + "] !" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+		}
+	}
+
+	@ Substituir
+	public  Curso  findByid ( Integer  id ) {
+
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		tente {
+			pst = conexao . prepareStatement ( "SELECT * FROM curso WHERE idcurso = ?" );
+			pst . setInt ( 1 , id );
+			rs = pst . executeQuery ();
+			if ( rs . próximo ()) {
+				Curso  obj = novo  Curso ();
+				obj . setIdcurso ( rs . getInt ( 1 ));
+				obj . setNomecurso ( rs . getString ( 2 ));
+				 obj de retorno ;
+			}
+			retornar  nulo ;
+		}
+		catch ( SQLException  e ){
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+		retornar  nulo ;
+	}
+
+	@ Substituir
+	public  List < Curso > findAll () {
+
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		List < Curso > lista = new  ArrayList <>();	
+
+		tente {
+			pst = conexao . prepareStatement ( "SELECT * FROM cursor" );
+			rs = pst . executeQuery ();
+			enquanto ( rs . próximo ()) {   
+				Curso  c = new  Curso ( rs . getInt ( "idcurso" ), rs . getString ( "nomecurso" ));
+				lista . adicionar ( c );
+			}
+		}
+		catch ( SQLException  e ) {
+			Sistema . fora . println ( e );
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+		 lista de retorno ;	
+	}
+-------------------------------------------------------------------------
+
+DisciplinaDAO.java
+
+modelo de pacote . dao ;
+
+importar  java . . _ lista ;
+
+ modelo importado . entidades . Disciplina ;
+
+public  interface  DisciplinaDAO {
+
+	 inserção vazia ( Disciplina  obj );
+	void  update ( Disciplina  obj );
+	void  deleteByid ( Integer  id );
+	Disciplina  findByid ( Integer  id );
+	List < Disciplina > findAll ();
+
+}
+--------------------------------------------------------------------------------
+DisciplinaDAOImpl.java
+modelo de pacote . dao ;
+
+importar  java . . _ Conexão ;
+importar  java . . _ Declaração Preparada ;
+importar  java . . _ Conjunto de resultados ;
+importar  java . . _ SQLException ;
+importar  java . . _ Declaração ;
+importar  java . . _ ArrayList ;
+importar  java . . _ lista ;
+
+ modelo importado . db . banco de dados ;
+ modelo importado . entidades . Disciplina ;
+
+public  class  DisciplinaDAOImpl  implementa  DisciplinaDAO {
+
+	 ligação  privada ligação ;
+
+	public  DisciplinaDAOImpl ( Conexão  conexão ) {
+		isso . conexao = conexao ;
+	}
+
+
+	@ Substituir
+	public  void  insert ( Disciplina  obj ) {
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		tente {
+			pst = conexao . prepareStatement (
+					"INSERT INTO disciplina (nomeDisciplina, cargahoraria) VALORES (?, ?) " ,
+					Declaração . RETURN_GENERATED_KEYS );
+
+			pst . setString ( 1 , obj . getNomeDisciplina ());
+			pst . setInt ( 2 , obj . getCargahoraria ());
+
+			int  linhas = pst . executeAtualizar ();
+
+			if ( linhas > 0 ) {
+				rs = pst . getGeneratedKeys ();
+				if ( rs . próximo ()) {
+						obj . setIdDisciplina ( rs . getInt ( 1 ));
+				}
+				Sistema . fora . println ( " Disciplina [ " 
+									+ obj . getIdDisciplina () + " | " 
+									+ obj . getNomeDisciplina () + "]"
+									+ "foi criada com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi possível se cadastrar na Disciplina!" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+
+	}
+
+	@ Substituir
+	public  void  update ( Disciplina  obj ) {
+
+		PreparedStatement  pst = null ;
+		tente {
+			pst = conexao . prepareStatement ( "ATUALIZAR disciplina SET NomeDisciplina =?"
+										  + "WHERE IdDisciplina = ?" );
+			pst . setString ( 1 , obj . getNomeDisciplina ());
+			pst . setInt ( 2 , obj . getIdDisciplina ());
+
+			int  linhas = pst . executeAtualizar ();
+			if ( linhas > 0 ) {	
+				Sistema . fora . println ( " Disciplina [ " 
+								+ obj . getIdDisciplina () + " | " 
+								+ obj . getNomeDisciplina () + "]"
+								+ " alterado com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi realizada a alteração da Disciplina!" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+		}
+	}
+
+
+	@ Substituir
+	public  void  deletarByid ( id inteiro  ) {
+
+		PreparedStatement  pst = null ;
+		tente {
+			pst = conexao . prepareStatement ( "DELETE FROM disciplina WHERE IdDisciplina = ?" );
+			pst . setInt ( 1 , id );
+
+			int  linhas = pst . executeAtualizar ();
+			if ( linhas > 0 ) {	
+				Sistema . fora . println ( "Disciplina [" + id + "] excluída com sucesso!" );
+			}
+			outra coisa {
+				Sistema . fora . println ( "Não foi possível excluir a Disciplina id[" + id + "] !" );
+			}
+		}
+		catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+		}
+
+	}
+
+	@ Substituir
+	public  Disciplina  findByid ( Integer  id ) {
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		tente {
+			pst = conexao . prepareStatement ( "SELECT * FROM Disciplina WHERE IdDisciplina = ?" );
+			pst . setInt ( 1 , id );
+			rs = pst . executeQuery ();
+			if ( rs . próximo ()) {
+				Disciplina  obj = new  Disciplina ();
+				obj . setIdDisciplina ( rs . getInt ( 1 ));
+				obj . setNomeDisciplina ( rs . getString ( 2 ));
+				 obj de retorno ;
+			}
+			retornar  nulo ;
+		}
+		catch ( SQLException  e ){
+			e . printStackTrace ();
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+		retornar  nulo ;
+	}
+
+	@ Substituir
+	public  List < Disciplina > findAll () {
+
+		PreparedStatement  pst = null ;
+		ResultSet  rs = null ;
+		List < Disciplina > lista = new  ArrayList <>();	
+
+		tente {
+			pst = conexao . prepareStatement ( "SELECT * FROM Disciplina" );
+			rs = pst . executeQuery ();
+			enquanto ( rs . próximo ()) {   
+				Disciplina  d = new  Disciplina ( rs . getInt ( "IdDisciplina" ), rs . getString ( "NomeDisciplina" ), rs . getInt ( "cargahoraria" ));
+				lista . adicionar ( d );
+			}
+		}
+		catch ( SQLException  e ) {
+			Sistema . fora . println ( e );
+		}
+		finalmente {
+			DB . dataPreparedStatement ( pst );
+			DB . dataResultSet ( rs );
+		}
+		 lista de retorno ;	
+	}
+
+}
+
+------------------------------------------------------------------------------
+FactorDAO.java
+modelo de pacote . dao ;
+
+ modelo importado . db . banco de dados ;
+
+public  class  FábricaDAO {
+
+	public  static  CursoDAO  createCursoDAO () {
+		return  novo  CursoDAOImpl ( DB . getConexao ());
+	}
+
+	public  static  AlunoDAO  createAlunoDAO () {
+		return  new  AlunoDAOImpl ( DB . getConexao ());
+	}
+
+	public  static  DisciplinaDAO  createDisciplinaDAO () {
+		return  new  DisciplinaDAOImpl ( DB . getConexao ());
+	}
+}
+---------------------------------------------------------------------------
+
+DB.javamodelo de pacote . banco de dados ;
+
+importar  java . io . FileInputStream ;
+importar  java . io . IOException ;
+importar  java . . _ Conexão ;
+importar  java . . _ DriverManager ;
+importar  java . . _ Declaração Preparada ;
+importar  java . . _ Conjunto de resultados ;
+importar  java . . _ SQLException ;
+importar  java . . _ Propriedades ;
+
+ banco de dados de classe  pública {
+
+	 conexão estática  privada conexão ; 
+
+	public  static  Properties  getPropriedades () {
+
+		Propriedades  propriedades = novas  Propriedades ();
+		tente {
+			FileInputStream  arquivo = new  FileInputStream ( "./propriedades/db.properties" );
+			propriedades . carrega ( arquivo );	
+		}
+		catch ( IOException  e ) {
+			e . printStackTrace ();
+		}
+		 propriedades de retorno ;
+	}
+
+	public  static  Connection  getConexao () {
+
+		tente {
+			if ( conexao == null ) {
+				Propriedades  p = DB . getPropriedades ();
+				conexao = DriverManager . getConnection (	 p . getProperty ( "host" ),
+														pág . getProperty ( "usuário" ),
+														pág . getProperty ( "senha" ));
+			}
+		} catch ( SQLException  e ) {
+			e . printStackTrace ();
+		}
+		 conexão de retorno ;
+	}
+
+	public  static  void  dataConexao () {
+		if ( conexão != null ) {
+			tente {
+				conexão . fechar ();
+			} catch ( SQLException  e ) {
+				e . printStackTrace ();
+			}
+		}
+	}
+
+	public  static  void  fechaPreparedStatement ( PreparedStatement  pst ) {
+
+		if ( pst != nulo ) {
+			tente {
+				pst . fechar ();
+			} catch ( SQLException  e ) {
+				e . printStackTrace ();
+			}
+		}
+	}
+
+	public  static  void  fechaResultSet ( ResultSet  rs ) {
+
+		if ( rs != nulo ) {
+			tente {
+				rs . fechar ();
+			} catch ( SQLException  e ) {
+				e . printStackTrace ();
+			}
+		}
+	}
+}
+-------------------------------------------------------------------------------
+Aluni.java
+modelo de pacote . entidades ;
+
+importar  java . . _ Data ;
+
+public  class  Aluno {
+
+	 id inteiro  privado ;
+	 string  privada nome ;
+	 sexo privado de cordas  ;
+	 data  privada dt_nasc ;
+	 Curso Curso  privado ;
+
+	public  Aluno () {
+
+	}
+
+	public  Aluno ( Integer  id , String  nome , String  sexo , Date  dt_nasc ) {
+		isso . id = id ;
+		isso . nome = nome ;
+		isso . sexo = sexo ;
+		isso . dt_nasc = dt_nasc ;
+	}
+
+	public  Aluno ( Integer  id , String  nome , String  sexo , Date  dt_nasc , Curso  curso ) {
+		isso . id = id ;
+		isso . nome = nome ;
+		isso . sexo = sexo ;
+		isso . dt_nasc = dt_nasc ;
+		isso . curso = curso ;
+	}
+
+	public  Integer  getId () {
+		 id de retorno ;
+	}
+
+	public  void  setId ( ID inteiro  ) {
+		isso . id = id ;
+	}
+
+	public  String  getNome () {
+		 nome de retorno ;
+	}
+
+	public  void  setNome ( String  nome ) {
+		isso . nome = nome ;
+	}
+
+	public  String  getSexo () {
+		voltar  sexo ;
+	}
+
+	public  void  setSexo ( String  sexo ) {
+		isso . sexo = sexo ;
+	}
+
+	 data  pública getDt_nasc () {
+		return  dt_nasc ;
+	}
+
+	public  void  setDt_nasc ( Data  dt_nasc ) {
+		isso . dt_nasc = dt_nasc ;
+	}
+
+	public  Curso  getCurso () {
+		 cursor de retorno ;
+	}
+
+	public  void  setCurso ( Curso  curso ) {
+		isso . curso = curso ;
+	}
+
+	@ Substituir
+	public  int  hashCode () {
+		final  int  primo = 31 ;
+		int  resultado = 1 ;
+		resultado = primo * resultado + (( dt_nasc == null ) ? 0 : dt_nasc . hashCode ());
+		resultado = primo * resultado + (( id == null ) ? 0 : id . hashCode ());
+		resultado = primo * resultado + (( nome == null ) ? 0 : nome . hashCode ());
+		resultado = primo * resultado + (( sexo == null ) ? 0 : sexo . hashCode ());
+		 resultado de retorno ;
+	}
+
+	@ Substituir
+	public  boolean  equals ( Object  obj ) {
+		se ( este == obj )
+			retorna  verdadeiro ;
+		if ( obj == nulo )
+			retorna  falso ;
+		if ( getClass () != obj . getClass ())
+			retorna  falso ;
+		Aluno  outro = ( Aluno ) obj ;
+		if ( dt_nasc == nulo ) {
+			if ( outro . dt_nasc != null )
+				retorna  falso ;
+		} else  if (! dt_nasc . equals ( other . dt_nasc ))
+			retorna  falso ;
+		if ( id == null ) {
+			if ( outro . id != null )
+				retorna  falso ;
+		} else  if (! id . equals ( other . id ))
+			retorna  falso ;
+		if ( nome == nulo ) {
+			if ( outro . nome != null )
+				retorna  falso ;
+		} else  if (! nome . equals ( outro . nome ))
+			retorna  falso ;
+		if ( sexo == nulo ) {
+			if ( outro . sexo != nulo )
+				retorna  falso ;
+		} else  if (! sexo . equals ( outro . sexo ))
+			retorna  falso ;
+		retorna  verdadeiro ;
+	}
+}
+------------------------------------------------------------------------------
+Curso.java
+ modelo de pacote . entidades ;
+
+public  class  Curso {
+
+	private  Integer  idcurso ;
+	private  String  nomecurso ;
+
+	público  Curso () {
+
+	}
+
+	public  Curso ( Integer  idcurso , String  nomecurso ) {
+		isso . idcurso = idcurso ;
+		isso . nomecurso = nomecurso ;
+	}
+
+	public  Integer  getIdcurso () {
+		return  idcurso ;
+	}
+
+	public  void  setIdcurso ( Integer  idcurso ) {
+		isso . idcurso = idcurso ;
+	}
+
+	public  String  getNomecurso () {
+		return  nomecurso ;
+	}
+
+	public  void  setNomecurso ( String  nomecurso ) {
+		isso . nomecurso = nomecurso ;
+	}
+
+	@ Substituir
+	public  int  hashCode () {
+		final  int  primo = 31 ;
+		int  resultado = 1 ;
+		resultado = primo * resultado + (( idcurso == null ) ? 0 : idcurso . hashCode ());
+		resultado = primo * resultado + (( nomecurso == null ) ? 0 : nomecurso . hashCode ());
+		 resultado de retorno ;
+	}
+
+	@ Substituir
+	public  boolean  equals ( Object  obj ) {
+		se ( este == obj )
+			retorna  verdadeiro ;
+		if ( obj == nulo )
+			retorna  falso ;
+		if ( getClass () != obj . getClass ())
+			retorna  falso ;
+		Curso  outro = ( Curso ) obj ;
+		if ( idcurso == null ) {
+			if ( outro . idcurso != null )
+				retorna  falso ;
+		} else  if (! idcurso . equals ( outro . idcurso ))
+			retorna  falso ;
+		if ( nomecurso == nulo ) {
+			if ( outro . nomecurso != null )
+				retorna  falso ;
+		} else  if (! nomecurso . equals ( outro . nomecurso ))
+			retorna  falso ;
+		retorna  verdadeiro ;
+	}
+
+	@ Substituir
+	public  String  toString () {
+		return  "Curso [idcurso=" + idcurso + ", nomecurso=" + nomecurso + "]" ;
+	}
+
+}
+--------------------------------------------------------------------------------
+Disciplina.java
+modelo de pacote . entidades ;
+
+public  class  Disciplina {
+
+	private  int  idDisciplina ;
+	private  String  nomeDisciplina ;
+	 cargahoraria privada int  ;
+
+	 Disciplina pública () {
+
+	}
+
+	public  Disciplina ( int  idDisciplina , String  nomeDisciplina , int  cargahoraria ) {
+		isso . idDisciplina = idDisciplina ;
+		isso . nomeDisciplina = nomeDisciplina ;
+		isso . cargahoraria = cargahoraria ;
+	}
+
+	public  int  getIdDisciplina () {
+		return  idDisciplina ;
+	}
+
+	public  void  setIdDisciplina ( int  idDisciplina ) {
+		isso . idDisciplina = idDisciplina ;
+	}
+
+	public  String  getNomeDisciplina () {
+		return  nomeDisciplina ;
+	}
+
+	public  void  setNomeDisciplina ( String  nomeDisciplina ) {
+		isso . nomeDisciplina = nomeDisciplina ;
+	}
+
+	public  int  getCargahoraria () {
+		devolver  cargahoraria ;
+	}
+
+	public  void  setCargahoraria ( int  cargahoraria ) {
+		isso . cargahoraria = cargahoraria ;
+	}
+
+	@ Substituir
+	public  int  hashCode () {
+		final  int  primo = 31 ;
+		int  resultado = 1 ;
+		resultado = primo * resultado + cargahoraria ;
+		resultado = prime * resultado + idDisciplina ;
+		resultado = primo * resultado + (( nomeDisciplina == null ) ? 0 : nomeDisciplina . hashCode ());
+		 resultado de retorno ;
+	}
+
+	@ Substituir
+	public  boolean  equals ( Object  obj ) {
+		se ( este == obj )
+			retorna  verdadeiro ;
+		if ( obj == nulo )
+			retorna  falso ;
+		if ( getClass () != obj . getClass ())
+			retorna  falso ;
+		Disciplina  outro = ( Disciplina ) obj ;
+		if ( cargahoraria != outro . cargahoraria )
+			retorna  falso ;
+		if ( idDisciplina != outro . idDisciplina )
+			retorna  falso ;
+		if ( nomeDisciplina == null ) {
+			if ( outro . nomeDisciplina != null )
+				retorna  falso ;
+		} else  if (! nomeDisciplina . equals ( outro . nomeDisciplina ))
+			retorna  falso ;
+		retorna  verdadeiro ;
+	}
+
+	@ Substituir
+	public  String  toString () {
+		return  "Disciplina [idDisciplina=" + idDisciplina + ", nomeDisciplina=" + nomeDisciplina + ", cargahoraria="
+				+ cargahoraria + "]" ;
+	}
+
+
+
+}
+----------------------------------------------------------------------------
+
+ProgramAluno.java
+ visão do pacote ;
+
+importar  java . texto . ParseException ;
+importar  java . texto . SimpleDateFormat ;
+importar  java . . _ Data ;
+importar  java . . _ lista ;
+importar  java . . _ Scanner ;
+importar  java . . _ concorrente . TimeUnit ;
+
+ modelo importado . dao . AlunoDAO ;
+ modelo importado . dao . FábricaDAO ;
+ modelo importado . entidades . Aluno ;
+
+public  class  TelaAluno {
+
+	static  AlunoDAO  alunoDao = FactoryDAO . criarAlunoDAO ();
+
+	@ SuppressWarnings ( "recurso" )
+	public  static  Scanner  menuAluno ( console do Scanner  ) lança InterruptedException , ParseException { 
+
+		int  opção = 0 ;
+		fazer {
+			Sistema . fora . println ( "\n\n" );
+			Sistema . fora . println ( "### Tela: Aluno ###" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . println ( " | 1 - Cadastrar |" );
+			Sistema . fora . println ( " | 2 - Listar |" );
+			Sistema . fora . println ( " | 3 - Alterar |" );
+			Sistema . fora . println ( " | 4 - Excluir |" );
+			Sistema . fora . println ( " | 0 - Retornar |" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . print ( "Opção ->" );
+			opção = console . proximoInt ();
+			console . proximaLinha ();
+
+			switch ( opção ) {
+			case  1 : console = cadastrar ( console );
+					quebrar ;
+			caso  2 :	 console = listar ( console );
+					quebrar ;
+			caso  3 : console = alterar ( console );
+					quebrar ;
+			caso  4 : console = excluir ( console );
+					quebrar ;
+			caso  0 :	 console = TelaPrincipal . menuPrincipal ( console );
+					quebrar ;
+			padrão :
+				Sistema . fora . println ( "Opção inválida!" );
+				TimeUnit . SEGUNDOS . dormir ( 1 );
+			}
+		} while ( opção != 0 );
+		 console de retorno ;
+	}
+
+	private  static  Scanner  cadastrar ( Console do Scanner  ) throws ParseException { 
+
+		Aluno  a = novo  Aluno ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( " ### Aluno-Cadastrar ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . print ( " | Nome: " );
+	    a . setNome ( console . nextLine ());
+
+		Sistema . fora . print ( " | Sexo: " );
+	    a . setSexo ( console . nextLine ());
+
+	    Sistema . fora . print ( " | Data de nascimento: " );
+	    a . setDt_nasc (( Date ) new  SimpleDateFormat ( "dd/MM/aaaa" ). parse ( console . nextLine () ) );
+	    Sistema . fora . println ( "=========================" );
+
+	    alunoDao . inserir ( a );
+
+	    console . proximaLinha ();
+	     console de retorno ;
+	}
+
+	private  static  Scanner  listar ( Console do Scanner  ) {
+
+		List < Aluno > alunos = alunoDao . encontrarTodos ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( "### Aluno-Listar ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . println ( "| Id\tSexo\t\tDataNascimento\t\tNome" );
+		for ( Aluno  a : alunos ) {
+			Sistema . fora . println ( " | " + a . getId ()
+							 + "\t"  		+ a . getSexo ()
+							 + "\t"  		+ a . getDt_nasc ()
+							 + "\t\t"  		+ a . getNome ());
+		}
+		Sistema . fora . println ( "=========================" );
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+
+	 alteração do Scanner estático  privado ( console do Scanner ) throws ParseException {   
+
+		Aluno  a = novo  Aluno ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( " ### Aluno-Alterar ###" );
+		Sistema . fora . println ( "=========================" );  		
+		Sistema . fora . imprima ( " | Id: " );
+		a . setId ( console . nextInt ());
+		console . proximaLinha ();
+
+		Sistema . fora . print ( " | Nome: " );
+		a . setNome ( console . nextLine ());
+
+		Sistema . fora . print ( " | Sexo: " );
+		a . setSexo ( console . nextLine ());
+
+		Sistema . fora . print ( " | Data de nascimento: " );
+		a . setDt_nasc (( Date ) new  SimpleDateFormat ( "dd/MM/aaaa" ). parse ( console . nextLine () ) );
+
+		Sistema . fora . println ( "=========================" );
+		alunoDao . atualizar ( a );
+
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+
+	private  static  Scanner  excluir ( Console do Scanner  ) throws ParseException { 
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( "### Aluno-Excluir ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . print ( " | Digite o Id: " );
+		int  id = console . proximoInt ();
+		console . proximaLinha ();
+		Sistema . fora . println ( "=========================" );
+
+		alunoDao . deleteByid ( id );
+
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+}
+------------------------------------------------------------------------------
+ProgramCurso.java
+visão do pacote ;
+
+importar  java . texto . ParseException ;
+importar  java . . _ lista ;
+importar  java . . _ Scanner ;
+importar  java . . _ concorrente . TimeUnit ;
+
+ modelo importado . dao . CursoDAO ;
+ modelo importado . dao . FábricaDAO ;
+ modelo importado . entidades . curso ;
+
+public  class  TelaCurso {
+
+	estático  CursoDAO  cursoDao = FactoryDAO . criarCursoDAO ();
+
+	@ SuppressWarnings ( "recurso" )
+	public  static  Scanner  menuCurso ( console do Scanner  ) lança InterruptedException , ParseException { 
+
+		int  opção = 0 ;
+		fazer {
+			Sistema . fora . println ( "\n\n" );
+			Sistema . fora . println ( "### Tela: Curso ###" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . println ( " | 1 - Cadastrar |" );
+			Sistema . fora . println ( " | 2 - Listar |" );
+			Sistema . fora . println ( " | 3 - Alterar |" );
+			Sistema . fora . println ( " | 4 - Excluir |" );
+			Sistema . fora . println ( " | 0 - Retornar |" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . print ( "Opção ->" );
+			opção = console . proximoInt ();
+			console . proximaLinha ();
+
+			switch ( opção ) {
+			case  1 : console = cadastrar ( console );
+					quebrar ;
+			caso  2 :	 console = listar ( console );
+					quebrar ;
+			caso  3 : console = alterar ( console );
+					quebrar ;
+			caso  4 : console = excluir ( console );
+					quebrar ;
+			caso  0 :	 console = TelaPrincipal . menuPrincipal ( console );
+					quebrar ;
+			padrão :
+				Sistema . fora . println ( "Opção inválida!" );
+				TimeUnit . SEGUNDOS . dormir ( 1 );
+			}
+		} while ( opção != 0 );
+		 console de retorno ;
+	}
+
+	private  static  Scanner  cadastrar ( Console do Scanner  ) throws ParseException { 
+
+		Curso  c = novo  Curso ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( "### Curso-Cadastrar ###" );
+		Sistema . fora . println ( "=========================" );
+
+		Sistema . fora . print ( " | Nome: " );
+	    c . setNomecurso ( console . nextLine ());
+
+	    Sistema . fora . println ( "=========================" );
+
+	    cursoDao . inserir ( c );
+
+	    console . proximaLinha ();
+	     console de retorno ;
+	}
+
+	private  static  Scanner  listar ( Console do Scanner  ) {
+
+		List < Curso > cursos = cursoDao . encontrarTodos ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( "### Curso-Listar ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . println ( "|Id\tNome" );
+		for ( Curso  c : cursos ) {
+			Sistema . fora . println ( " | " + c . getIdcurso ()
+							 + "\t"  		+ c . getNomecurso () );
+		}
+		Sistema . fora . println ( "=========================" );
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+
+	 alteração do Scanner estático  privado ( console do Scanner ) throws ParseException {   
+
+		Curso  c = novo  Curso ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( "### Curso-Alterar ###" );
+		Sistema . fora . println ( "=========================" );  		
+		Sistema . fora . imprima ( " | Id: " );
+		c . setIdcurso ( console . nextInt ());
+		console . proximaLinha ();
+
+		Sistema . fora . print ( " | Nome: " );
+		c . setNomecurso ( console . nextLine ());
+
+		Sistema . fora . println ( "=========================" );
+		cursoDao . atualizar ( c );
+
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+
+	private  static  Scanner  excluir ( Console do Scanner  ) throws ParseException { 
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( "### Curso-Excluir ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . print ( " | Digite o Id: " );
+		int  id = console . proximoInt ();
+		console . proximaLinha ();
+		Sistema . fora . println ( "=========================" );
+
+		cursoDao . deleteByid ( id );
+
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+}
+------------------------------------------------------------------------------
+ProgramDisciplina.java
+visão do pacote ;
+
+importar  java . texto . ParseException ;
+importar  java . . _ lista ;
+importar  java . . _ Scanner ;
+importar  java . . _ concorrente . TimeUnit ;
+
+ modelo importado . dao . DisciplinaDAO ;
+ modelo importado . dao . FábricaDAO ;
+
+ modelo importado . entidades . Disciplina ;
+
+public  class  TelaDisciplina {
+
+	static  DisciplinaDAO  disciplinaDao = FactoryDAO . criarDisciplinaDAO ();
+
+
+	@ SuppressWarnings ( "recurso" )
+	public  static  Scanner  menuDisciplina ( console do Scanner  ) lança InterruptedException , ParseException { 
+
+		int  opção = 0 ;
+		fazer {
+			Sistema . fora . println ( "\n\n" );
+			Sistema . fora . println ( "### Tela: Disciplina ###" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . println ( " | 1 - Cadastrar |" );
+			Sistema . fora . println ( " | 2 - Listar |" );
+			Sistema . fora . println ( " | 3 - Alterar |" );
+			Sistema . fora . println ( " | 4 - Excluir |" );
+			Sistema . fora . println ( " | 0 - Retornar |" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . print ( "Opção ->" );
+			opção = console . proximoInt ();
+			console . proximaLinha ();
+
+			switch ( opção ) {
+			case  1 : console = cadastrar ( console );
+					quebrar ;
+			caso  2 :	 console = listar ( console );
+					quebrar ;
+			caso  3 : console = alterar ( console );
+					quebrar ;
+			caso  4 : console = excluir ( console );
+					quebrar ;
+			caso  0 :	 console = TelaPrincipal . menuPrincipal ( console );
+					quebrar ;
+			padrão :
+				Sistema . fora . println ( "Opção inválida!" );
+				TimeUnit . SEGUNDOS . dormir ( 1 );
+			}
+		} while ( opção != 0 );
+		 console de retorno ;
+	}
+
+
+	private  static  Scanner  excluir ( Console do Scanner  ) {
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( " ### Disciplina-Excluir ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . print ( " | Digite o Id: " );
+		int  id = console . proximoInt ();
+		console . proximaLinha ();
+		Sistema . fora . println ( "=========================" );
+
+		disciplinaDao . deleteByid ( id );
+
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+
+
+	 alteração do Scanner estático  privado ( console do Scanner ) {  
+
+		Disciplina  d = nova  Disciplina ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( " ### Disciplina-Alterar ###" );
+		Sistema . fora . println ( "=========================" );  		
+		Sistema . fora . imprima ( " | Id: " );
+		d . setIdDisciplina ( console . nextInt ());
+		console . proximaLinha ();
+
+		Sistema . fora . print ( " | Nome: " );
+		d . setNomeDisciplina ( console . nextLine ());
+
+		Sistema . fora . print ( " | Carga Horária: " );
+		d . setCargahoraria ( console . nextInt ());
+		console . proximaLinha ();
+
+		Sistema . fora . println ( "=========================" );
+		disciplinaDao . atualizar ( d );
+
+		console . proximaLinha ();
+		 console de retorno ;
+
+	}
+
+
+	private  static  Scanner  listar ( Console do Scanner  ) {
+	List < Disciplina > disciplina = disciplinaDao . encontrarTodos ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( " ### Disciplina-Listar ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . println ( "|Id\tNome\tCargaHoraria" );
+		for ( Disciplina  d : disciplina ) {
+			Sistema . fora . println ( " | " + d . getIdDisciplina ()
+							 + "\t"  		+ d . getNomeDisciplina ()
+							 + "\t"  		+ d . getCargahoraria ());
+		}
+		Sistema . fora . println ( "=========================" );
+		console . proximaLinha ();
+		 console de retorno ;
+	}
+
+
+	private  static  Scanner  cadastrar ( Console do Scanner  ) {
+
+	Disciplina  d = nova  Disciplina ();
+
+		Sistema . fora . println ( "\n\n" );
+		Sistema . fora . println ( " ### Disciplina-Cadastrar ###" );
+		Sistema . fora . println ( "=========================" );
+		Sistema . fora . print ( " | Nome: " );
+	    d . setNomeDisciplina ( console . nextLine ());
+
+		Sistema . fora . print ( " | CargaHorário: " );
+	    d . setCargahoraria ( console . nextInt ());
+	    Sistema . fora . println ( "=========================" );
+
+	    disciplinaDao . inserir ( d );
+
+	    console . proximaLinha ();
+	     console de retorno ;
+	}
+}
+
+------------------------------------------------------------------------------
+Program.java
+ visão do pacote ;
+
+importar  java . texto . ParseException ;
+importar  java . . _ Scanner ;
+importar  java . . _ concorrente . TimeUnit ;
+
+public  class  TelaPrincipal {
+
+	public  static  Scanner  menuPrincipal ( console do Scanner  ) throws ParseException , InterruptedException { 
+
+		int  opção = 0 ;
+		fazer {
+			Sistema . fora . println ( "\n\n### Sistema de Controle Escolar ###" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . println ( " | 1 - Aluno |" );
+			Sistema . fora . println ( "| 2 - Curso |" );
+			Sistema . fora . println ( "| 3 - Disciplina |" );
+			Sistema . fora . println ( " | 0 - Sair |" );
+			Sistema . fora . println ( "=========================" );
+			Sistema . fora . print ( "Opção ->" );
+			opção = console . proximoInt ();
+			console . proximaLinha ();
+
+			switch ( opção ) {
+				caso  1 : retornar  TelaAluno . menuAluno ( console );
+				caso  2 : retornar  TelaCurso . menuCurso ( console );
+				caso  3 : retornar  TelaDisciplina . menuDisciplina ( console );
+				caso  0 : Sistema . fora . println ( "Aplicação foi encerrada!" );
+						quebrar ;
+				padrão :
+					Sistema . fora . println ( "Opção Inválida!" );
+					TimeUnit . SEGUNDOS . dormir ( 1 );
+			}
+		} while ( opção != 0 );
+		 console de retorno ;
+	}
+}
+-----------------------------------------------------------------------------
